@@ -38,7 +38,7 @@ pub fn run() -> Result<()> {
     write_int_bytes(&mut audio_file, 1, 2)?; // Number of channels
     write_int_bytes(&mut audio_file, 44_100, 4)?; // Sample rate
 
-    let bitrate = (sine::SAMPLE_RATE as u32 * sine::BIT_DEPTH / 8) as u32; // 88_200
+    let bitrate = (sine::SAMPLE_RATE * sine::BIT_DEPTH / 8) as u32; // 88_200
     write_int_bytes(&mut audio_file, bitrate, 4)?; // Bitrate
 
     write_int_bytes(&mut audio_file, 2, 2)?; // Block align (bitdepth / 8 in this case)
@@ -48,10 +48,7 @@ pub fn run() -> Result<()> {
     write_str_bytes(&mut audio_file, "data")?;
     write_str_bytes(&mut audio_file, "----")?;
 
-    let pre_audio_pos = audio_file.stream_position().unwrap();
-    println!("Pre audio pos: {pre_audio_pos}");
-
-    for _ in 0..(sine::SAMPLE_RATE * 2.0) as u32 {
+    for _ in 0..sine::SAMPLE_RATE * 2 {
         let sample = osc.process();
         let int_sample: i16 = (sample * sine::MAX_AMPLITUDE as f64) as i16;
         audio_file.write_all(&int_sample.to_ne_bytes()).unwrap();
@@ -60,6 +57,7 @@ pub fn run() -> Result<()> {
     let post_audio_pos = audio_file.stream_position().unwrap();
     println!("Post audio pos: {post_audio_pos}");
 
+    let pre_audio_pos = audio_file.stream_position().unwrap();
     audio_file.seek(SeekFrom::Start(pre_audio_pos - 4)).unwrap();
     audio_file
         .write(&(post_audio_pos as u32 - pre_audio_pos as u32).to_ne_bytes())
