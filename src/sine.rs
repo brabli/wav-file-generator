@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-pub const SAMPLE_RATE: f64 = 44_100.0;
+pub const SAMPLE_RATE: u32 = 44_100;
 pub const BIT_DEPTH: u32 = 16;
 pub const MAX_AMPLITUDE: u32 = 2_u32.pow(BIT_DEPTH - 1) - 1;
 
@@ -17,7 +17,7 @@ impl SineOscillator {
             frequency,
             amplitude,
             angle: 0.0,
-            offset: 2.0 * PI * frequency / SAMPLE_RATE,
+            offset: 2_f64 * PI * frequency / SAMPLE_RATE as f64,
         }
     }
 
